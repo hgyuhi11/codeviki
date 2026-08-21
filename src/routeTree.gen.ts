@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as CharactersIndexRouteImport } from './routes/characters.index'
+import { Route as CharactersIdRouteImport } from './routes/characters.$id'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -22,30 +23,39 @@ const CharactersIndexRoute = CharactersIndexRouteImport.update({
   path: '/characters/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CharactersIdRoute = CharactersIdRouteImport.update({
+  id: '/characters/$id',
+  path: '/characters/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/characters/$id': typeof CharactersIdRoute
   '/characters/': typeof CharactersIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/characters/$id': typeof CharactersIdRoute
   '/characters': typeof CharactersIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/characters/$id': typeof CharactersIdRoute
   '/characters/': typeof CharactersIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/characters/'
+  fullPaths: '/' | '/characters/$id' | '/characters/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/characters'
-  id: '__root__' | '/' | '/characters/'
+  to: '/' | '/characters/$id' | '/characters'
+  id: '__root__' | '/' | '/characters/$id' | '/characters/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  CharactersIdRoute: typeof CharactersIdRoute
   CharactersIndexRoute: typeof CharactersIndexRoute
 }
 
@@ -65,11 +75,19 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CharactersIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/characters/$id': {
+      id: '/characters/$id'
+      path: '/characters/$id'
+      fullPath: '/characters/$id'
+      preLoaderRoute: typeof CharactersIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  CharactersIdRoute: CharactersIdRoute,
   CharactersIndexRoute: CharactersIndexRoute,
 }
 export const routeTree = rootRouteImport
