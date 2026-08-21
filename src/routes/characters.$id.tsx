@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowRight } from "lucide-react";
-import { MediaImage } from "@/components/Media";
+import { ItemGallery } from "@/components/ItemGallery";
 import { RarityBadge } from "@/components/ItemCard";
 import { itemQuery } from "@/lib/content";
 
@@ -53,12 +53,7 @@ function CharacterDetail() {
       </Link>
 
       <div className="grid gap-8 md:grid-cols-2">
-        <MediaImage
-          path={item.image_path}
-          alt={item.name}
-          className="aspect-[4/5] w-full rounded-md ring-1 ring-black/10"
-          fallbackLabel="Operator"
-        />
+        <ItemGallery itemId={item.id} fallbackPath={item.image_path} alt={item.name} />
         <div>
           <div className="mb-3 flex items-center gap-3">
             <RarityBadge rarity={item.rarity} />
