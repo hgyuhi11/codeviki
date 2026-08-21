@@ -260,7 +260,7 @@ function AdminDashboard({ email }: { email: string }) {
       } else {
         const { data, error } = await supabase.from("items").insert(payload).select("id").single();
         if (error) throw error;
-        itemId = data.id;
+        itemId = data?.id ?? null;
         toast.success("آیتم در پایگاه داده ثبت شد");
       }
       if (!itemId) throw new Error("شناسه آیتم پیدا نشد");
