@@ -9,7 +9,7 @@ export function ItemGallery({ itemId, fallbackPath, alt, className }: { itemId: 
   const media: ItemMedia[] = data ?? [];
   const [active, setActive] = useState(0);
   const paths = media.length ? media.map((entry) => ({ path: entry.media_path, alt: entry.alt_text || alt })) : [{ path: fallbackPath, alt }];
-  const selected = paths[Math.min(active, paths.length - 1)];
+  const selected = paths[Math.min(active, paths.length - 1)] ?? { path: fallbackPath, alt };
 
   return <div className={className}>
     <MediaImage path={selected.path} alt={selected.alt} className="aspect-[4/3] w-full rounded-md ring-1 ring-black/10" fallbackLabel="Media" />
