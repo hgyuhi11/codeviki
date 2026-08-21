@@ -56,6 +56,12 @@ export type Database = {
         }
         Relationships: []
       }
+      item_media: {
+        Row: { alt_text: string | null; created_at: string; id: string; item_id: string; media_path: string; sort_order: number }
+        Insert: { alt_text?: string | null; created_at?: string; id?: string; item_id: string; media_path: string; sort_order?: number }
+        Update: { alt_text?: string | null; created_at?: string; id?: string; item_id?: string; media_path?: string; sort_order?: number }
+        Relationships: []
+      }
       site_settings: {
         Row: {
           about_text: string
@@ -84,6 +90,12 @@ export type Database = {
           teaser_video_path?: string | null
           updated_at?: string
         }
+        Relationships: []
+      }
+      weapon_stats: {
+        Row: { accuracy: number | null; control: number | null; created_at: string; damage: number | null; description: string | null; fire_rate: number | null; id: string; item_id: string; magazine_size: number | null; mobility: number | null; penetration: number | null; range: number | null; reload_time: number | null; updated_at: string }
+        Insert: { accuracy?: number | null; control?: number | null; created_at?: string; damage?: number | null; description?: string | null; fire_rate?: number | null; id?: string; item_id: string; magazine_size?: number | null; mobility?: number | null; penetration?: number | null; range?: number | null; reload_time?: number | null; updated_at?: string }
+        Update: { accuracy?: number | null; control?: number | null; created_at?: string; damage?: number | null; description?: string | null; fire_rate?: number | null; id?: string; item_id?: string; magazine_size?: number | null; mobility?: number | null; penetration?: number | null; range?: number | null; reload_time?: number | null; updated_at?: string }
         Relationships: []
       }
       user_roles: {
