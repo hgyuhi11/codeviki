@@ -27,6 +27,28 @@ export type SiteSettings = {
   teaser_video_path: string | null;
 };
 
+export type ItemMedia = {
+  id: string;
+  item_id: string;
+  media_path: string;
+  alt_text: string | null;
+  sort_order: number;
+};
+
+export type WeaponStats = {
+  item_id: string;
+  damage: number | null;
+  accuracy: number | null;
+  range: number | null;
+  fire_rate: number | null;
+  mobility: number | null;
+  control: number | null;
+  penetration: number | null;
+  magazine_size: number | null;
+  reload_time: number | null;
+  description: string | null;
+};
+
 export const RARITY_LABEL: Record<ItemRarity, string> = {
   legendary: "لجندری",
   mythic: "متیک",
@@ -60,6 +82,35 @@ export const itemQuery = (id: string) =>
       const { data, error } = await supabase.from("items").select("*").eq("id", id).maybeSingle();
       if (error) throw error;
       return (data ?? null) as Item | null;
+    },
+  });
+
+export const itemMediaQuery = (itemId: string) =>
+  queryOptions({
+    queryKey: ["item-media", itemId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("item_media")
+        .select("*")
+        .eq("item_id", itemId)
+        .order("sort_order", { ascending: true })
+        .order("created_at", { ascending: true });
+      if (error) throw error;
+      return (data ?? []) as ItemMedia[];
+    },
+  });
+
+export const weaponStatsQuery = (itemId: string) =>
+  queryOptions({
+    queryKey: ["weapon-stats", itemId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("weapon_stats")
+        .select("*")
+        .eq("item_id", itemId)
+        .maybeSingle();
+      if (error) throw error;
+      return (data ?? null) as WeaponStats | null;
     },
   });
 

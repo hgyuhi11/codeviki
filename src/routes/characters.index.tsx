@@ -33,8 +33,12 @@ const FILTERS: Array<{ value: "all" | ItemRarity; label: string }> = [
 function CharactersPage() {
   const { data, isLoading } = useQuery(itemsQuery("character"));
   const [filter, setFilter] = useState<"all" | ItemRarity>("all");
+  const [search, setSearch] = useState("");
 
-  const items = (data ?? []).filter((item) => filter === "all" || item.rarity === filter);
+  const items = (data ?? []).filter((item) => {
+    const term = search.trim().toLocaleLowerCase("fa");
+    return (filter === "all" || item.rarity === filter) && (!term || `${item.name} ${item.name_en ?? ""} ${item.summary}`.toLocaleLowerCase("fa").includes(term));
+  });
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-8">
@@ -44,6 +48,8 @@ function CharactersPage() {
           اسکین‌های لجندری و متیک اپراتورها با تصویر و بیوگرافی.
         </p>
       </header>
+
+      <input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="جست‌وجوی نام یا بیوگرافی کاراکتر" className="mb-4 w-full border border-border bg-background px-3 py-2 text-sm text-foreground outline-none focus:border-tactical" />
 
       <div className="no-scrollbar mb-6 flex gap-2 overflow-x-auto">
         {FILTERS.map((option) => (
@@ -66,7 +72,7 @@ function CharactersPage() {
         <p className="text-sm text-muted-foreground">در حال بارگذاری…</p>
       ) : items.length === 0 ? (
         <p className="border border-dashed border-border p-6 text-center text-sm text-muted-foreground">
-          هنوز کاراکتری ثبت نشده است.
+          {search || filter !== "all" ? "نتیجه‌ای پیدا نشد." : "هنوز کاراکتری ثبت نشده است."}
         </p>
       ) : (
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
