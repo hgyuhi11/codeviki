@@ -1,9 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowRight } from "lucide-react";
-import { MediaImage } from "@/components/Media";
+import { ItemGallery } from "@/components/ItemGallery";
+import { WeaponStatsPanel } from "@/components/WeaponStatsPanel";
 import { RarityBadge } from "@/components/ItemCard";
-import { itemQuery } from "@/lib/content";
+import { itemQuery, weaponStatsQuery } from "@/lib/content";
 
 export const Route = createFileRoute("/weapons/$id")({
   head: () => ({
@@ -26,6 +27,7 @@ export const Route = createFileRoute("/weapons/$id")({
 function WeaponDetail() {
   const { id } = Route.useParams();
   const { data: item, isLoading } = useQuery(itemQuery(id));
+  const { data: stats } = useQuery(weaponStatsQuery(id));
 
   if (isLoading) {
     return <p className="mx-auto max-w-5xl px-4 py-10 text-sm text-muted-foreground">در حال بارگذاری…</p>;
@@ -53,12 +55,7 @@ function WeaponDetail() {
       </Link>
 
       <div className="grid gap-8 md:grid-cols-2">
-        <MediaImage
-          path={item.image_path}
-          alt={item.name}
-          className="aspect-[4/3] w-full rounded-md ring-1 ring-black/10"
-          fallbackLabel="Weapon"
-        />
+        <ItemGallery itemId={item.id} fallbackPath={item.image_path} alt={item.name} />
         <div>
           <div className="mb-3 flex items-center gap-3">
             <RarityBadge rarity={item.rarity} />
@@ -72,6 +69,7 @@ function WeaponDetail() {
           <p className="text-sm leading-loose whitespace-pre-line text-foreground/85">
             {item.bio || "توضیحی برای این اسلحه ثبت نشده است."}
           </p>
+          <WeaponStatsPanel stats={stats ?? null} />
         </div>
       </div>
     </article>
