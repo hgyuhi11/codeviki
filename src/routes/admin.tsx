@@ -165,6 +165,16 @@ type FormState = {
   bio: string;
   sort_order: number;
   image_path: string | null;
+  damage: string;
+  accuracy: string;
+  range: string;
+  fire_rate: string;
+  mobility: string;
+  control: string;
+  penetration: string;
+  magazine_size: string;
+  reload_time: string;
+  stats_description: string;
 };
 
 const emptyForm: FormState = {
@@ -177,6 +187,7 @@ const emptyForm: FormState = {
   bio: "",
   sort_order: 0,
   image_path: null,
+  damage: "", accuracy: "", range: "", fire_rate: "", mobility: "", control: "", penetration: "", magazine_size: "", reload_time: "", stats_description: "",
 };
 
 async function uploadFile(file: File, folder: string) {
@@ -196,6 +207,7 @@ function AdminDashboard({ email }: { email: string }) {
   const { data: settings } = useQuery(settingsQuery);
   const [form, setForm] = useState<FormState>(emptyForm);
   const [file, setFile] = useState<File | null>(null);
+  const [galleryFiles, setGalleryFiles] = useState<File[]>([]);
   const [saving, setSaving] = useState(false);
 
   const [texts, setTexts] = useState({
@@ -240,17 +252,31 @@ function AdminDashboard({ email }: { email: string }) {
         image_path: imagePath,
       };
 
+      let itemId = form.id;
       if (form.id) {
         const { error } = await supabase.from("items").update(payload).eq("id", form.id);
         if (error) throw error;
         toast.success("آیتم بروزرسانی شد");
       } else {
-        const { error } = await supabase.from("items").insert(payload);
+        const { data, error } = await supabase.from("items").insert(payload).select("id").single();
         if (error) throw error;
+        itemId = data.id;
         toast.success("آیتم در پایگاه داده ثبت شد");
+      }
+      if (!itemId) throw new Error("شناسه آیتم پیدا نشد");
+      if (galleryFiles.length) {
+        const paths = await Promise.all(galleryFiles.map((galleryFile) => uploadFile(galleryFile, `${form.category === "weapon" ? "weapons" : "characters"}/gallery`)));
+        const { error } = await supabase.from("item_media").insert(paths.map((media_path, index) => ({ item_id: itemId, media_path, sort_order: index })));
+        if (error) throw error;
+      }
+      if (form.category === "weapon" && [form.damage, form.accuracy, form.range, form.fire_rate, form.mobility, form.control, form.penetration, form.magazine_size, form.reload_time, form.stats_description].some(Boolean)) {
+        const numberOrNull = (value: string) => value === "" ? null : Number(value);
+        const { error } = await supabase.from("weapon_stats").upsert({ item_id: itemId, damage: numberOrNull(form.damage), accuracy: numberOrNull(form.accuracy), range: numberOrNull(form.range), fire_rate: numberOrNull(form.fire_rate), mobility: numberOrNull(form.mobility), control: numberOrNull(form.control), penetration: numberOrNull(form.penetration), magazine_size: numberOrNull(form.magazine_size), reload_time: numberOrNull(form.reload_time), description: form.stats_description || null }, { onConflict: "item_id" });
+        if (error) throw error;
       }
       setForm(emptyForm);
       setFile(null);
+      setGalleryFiles([]);
       invalidate();
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "خطا در ذخیره");
@@ -340,6 +366,18 @@ function AdminDashboard({ email }: { email: string }) {
               </select>
             </div>
           </div>
+
+          <div>
+            <label className={labelClass}>گالری تصاویر (اختیاری)</label>
+            <input type="file" multiple accept="image/*" onChange={(e) => setGalleryFiles(Array.from(e.target.files ?? []))} className="w-full border border-dashed border-border bg-background px-3 py-2 text-xs text-muted-foreground" />
+            {galleryFiles.length ? <p className="mt-1 text-[10px] text-muted-foreground">{galleryFiles.length} تصویر برای گالری آماده است.</p> : null}
+          </div>
+
+          {form.category === "weapon" ? <fieldset className="space-y-3 border border-border/60 p-4">
+            <legend className="px-1 text-xs text-tactical">مشخصات اسلحه</legend>
+            <div className="grid gap-3 sm:grid-cols-3">{([['damage','قدرت'],['accuracy','دقت'],['range','برد'],['fire_rate','سرعت شلیک'],['mobility','تحرک'],['control','کنترل'],['penetration','نفوذ'],['magazine_size','خشاب'],['reload_time','زمان بارگذاری']] as const).map(([key, label]) => <label key={key} className={labelClass}>{label}<input type="number" min="0" value={form[key]} onChange={(e) => setForm({ ...form, [key]: e.target.value })} className={`${inputClass} mt-1`} /></label>)}</div>
+            <textarea rows={2} value={form.stats_description} onChange={(e) => setForm({ ...form, stats_description: e.target.value })} placeholder="توضیح کوتاه درباره عملکرد اسلحه" className={inputClass} />
+          </fieldset> : null}
 
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
@@ -464,6 +502,7 @@ function AdminDashboard({ email }: { email: string }) {
                           bio: item.bio,
                           sort_order: item.sort_order,
                           image_path: item.image_path,
+                          damage: "", accuracy: "", range: "", fire_rate: "", mobility: "", control: "", penetration: "", magazine_size: "", reload_time: "", stats_description: "",
                         })
                       }
                       className="flex items-center gap-1 text-[10px] text-muted-foreground hover:text-foreground"
