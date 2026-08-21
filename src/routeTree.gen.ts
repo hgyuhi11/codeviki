@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AboutRouteImport } from './routes/about'
+import { Route as AdminRouteImport } from './routes/admin'
 import { Route as CharactersIndexRouteImport } from './routes/characters.index'
 import { Route as CharactersIdRouteImport } from './routes/characters.$id'
 import { Route as WeaponsIndexRouteImport } from './routes/weapons.index'
@@ -24,6 +25,11 @@ const IndexRoute = IndexRouteImport.update({
 const AboutRoute = AboutRouteImport.update({
   id: '/about',
   path: '/about',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CharactersIndexRoute = CharactersIndexRouteImport.update({
@@ -50,6 +56,7 @@ const WeaponsIdRoute = WeaponsIdRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/admin': typeof AdminRoute
   '/characters/$id': typeof CharactersIdRoute
   '/weapons/$id': typeof WeaponsIdRoute
   '/characters/': typeof CharactersIndexRoute
@@ -58,6 +65,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/admin': typeof AdminRoute
   '/characters/$id': typeof CharactersIdRoute
   '/weapons/$id': typeof WeaponsIdRoute
   '/characters': typeof CharactersIndexRoute
@@ -67,6 +75,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/admin': typeof AdminRoute
   '/characters/$id': typeof CharactersIdRoute
   '/weapons/$id': typeof WeaponsIdRoute
   '/characters/': typeof CharactersIndexRoute
@@ -77,6 +86,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/about'
+    | '/admin'
     | '/characters/$id'
     | '/weapons/$id'
     | '/characters/'
@@ -85,6 +95,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/about'
+    | '/admin'
     | '/characters/$id'
     | '/weapons/$id'
     | '/characters'
@@ -93,6 +104,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/about'
+    | '/admin'
     | '/characters/$id'
     | '/weapons/$id'
     | '/characters/'
@@ -102,6 +114,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
+  AdminRoute: typeof AdminRoute
   CharactersIdRoute: typeof CharactersIdRoute
   WeaponsIdRoute: typeof WeaponsIdRoute
   CharactersIndexRoute: typeof CharactersIndexRoute
@@ -122,6 +135,13 @@ declare module '@tanstack/react-router' {
       path: '/about'
       fullPath: '/about'
       preLoaderRoute: typeof AboutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/characters/': {
@@ -158,6 +178,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
+  AdminRoute: AdminRoute,
   CharactersIdRoute: CharactersIdRoute,
   WeaponsIdRoute: WeaponsIdRoute,
   CharactersIndexRoute: CharactersIndexRoute,
